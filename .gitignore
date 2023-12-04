@@ -1,1 +1,5 @@
-__pycache__/*
+__pycache__/
+sample/labels/
+sample/linear/
+sample/mel/
+sample/rainbow/
