@@ -1,4 +1,5 @@
 import tkinter as tk, pandas as pd, time, os
+import sys, subprocess
 from tkinter import messagebox, HORIZONTAL, filedialog
 from silic import *
 
@@ -281,7 +282,13 @@ def run():
     text.insert(tk.END, "%s used." % str(time.time() - t0))
     text.see(tk.END)
     root.update()
-    os.startfile(result_path)
+    # os.startfile(result_path)
+    if sys.platform == "win32":
+      os.startfile(result_path)
+    else:
+      opener = "open" if sys.platform == "darwin" else "xdg-open"   # For Linux and MacOS
+      subprocess.call([opener, result_path])
+
 
 
 root.columnconfigure(0, weight=1)
