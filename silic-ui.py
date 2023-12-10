@@ -369,4 +369,15 @@ run_button.grid(row=5, column=0, columnspan=5, sticky=tk.E + tk.W)
 text = tk.Text(root, height=10)
 text.grid(row=6, column=0, columnspan=5, sticky=tk.E + tk.W)
 
+
+def folder_init(in_path: str="sample", out_path: str="result_silic"):
+  _path = os.getcwd()
+  inputfolder.initialize(value=os.path.join(_path, in_path))
+  outputfolder.initialize(value=os.path.join(_path, out_path))
+  folder_input_path_label.config(text=os.path.join(_path, in_path))
+  folder_output_path_label.config(text=os.path.join(_path, out_path))
+  return 0
+
+folder_init()
+
 root.mainloop()
