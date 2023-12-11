@@ -11,7 +11,7 @@ from yolov5.utils.dataloaders import letterbox
 from yolov5.utils.general import non_max_suppression, scale_boxes, xyxy2xywh
 from PIL import ImageFont, ImageDraw, Image
 
-def speed_change(sound, speed=1.0):
+def speed_change(sound: AudioSegment, speed=1.0):
   # Manually override the frame_rate. This tells the computer how many
   # samples to play per second
   sound_with_altered_frame_rate = sound._spawn(
@@ -108,17 +108,6 @@ def get_media_files(directory):
 
 
 class Silic:
-  """
-  Arguments:
-    sr (int): Sampling Rate in Hz
-    n_fft (int): Window(Frame) Size in samples
-    hop_length (str): Frame Step (or Hop Size) in samples
-    n_mels (int): The number of Mel filter banks
-    fmin (int): The starting frequency for the lowest Mel filter bank in Hz
-    fmax (int): The ending frequency for the highest Mel filter bank in Hz
-    clip_length (int): The duration of each inference in ms
-  """
-
   def __init__(
     self,
     sr=32000,
@@ -130,6 +119,16 @@ class Silic:
     device=None,
     clip_length=3000,
   ):
+    """
+    Arguments:
+      sr (int): Sampling Rate in Hz
+      n_fft (int): Window(Frame) Size in samples
+      hop_length (str): Frame Step (or Hop Size) in samples
+      n_mels (int): The number of Mel filter banks
+      fmin (int): The starting frequency for the lowest Mel filter bank in Hz
+      fmax (int): The ending frequency for the highest Mel filter bank in Hz
+      clip_length (int): The duration of each inference in ms
+    """
     self.sr = sr
     self.n_fft = n_fft
     self.hop_length = hop_length
