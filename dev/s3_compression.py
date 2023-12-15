@@ -6,12 +6,13 @@ from minio.error import S3Error
 
 # 定義要讀取和轉換的.wav檔案的路徑
 wav_file = "/home/lazoark/lobby/silic/dev/TT01_20210401_060000.wav"
+wav_file = "dev/wav2flac_demo.flac"
 
 # 定義要轉換成的.flac檔案的路徑
 flac_file = "output.flac"
 
 # 定義要上傳到的S3的桶名和物件名
-bucket_name = "silic_bucket"
+bucket_name = "silic-bucket"
 object_name = "output.flac"
 
 # 定義S3的連接資訊，包括端點、存取金鑰和密碼
