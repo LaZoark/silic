@@ -14,8 +14,8 @@ import typing
 # ACCESS_KEY: str = '836f6e5b71294a50989599f54a63f628'
 # SECRET_KEY: str = 'xqDXwM57kYuA01ptpToWbtuj5SzSKAFzc'
 # BUCKET_NAME: str = 'ntutony-demo'
-# MINIO_ENDPOINT: str = "localhost:9010"
-MINIO_ENDPOINT: str = "140.113.13.93:9010"
+# MINIO_ENDPOINT: str = "140.113.13.93:9010"
+MINIO_ENDPOINT: str = "localhost:9010"
 ACCESS_KEY: str = "admin"
 SECRET_KEY: str = "987654321"
 BUCKET_NAME: str = "silic-bucket"
@@ -69,10 +69,10 @@ def record_audio(duration: int, folder: str="."):
   upload_to_minio(audio_file)
 
   # POST API
-  # try:
-  #   post_byrestful(filename)
-  # except Exception as e:
-  #   print(f"[!!] {e}")
+  try:
+    post_byrestful(filename)
+  except Exception as e:
+    print(f"[!!] {e}")
 
 
 def upload_to_minio(filepath):
