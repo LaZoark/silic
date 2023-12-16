@@ -26,7 +26,7 @@ AUDIO_FORMAT: int = pyaudio.paInt16
 AUDIO_FILE_FORMAT: str = ".wav"
 MIC_CHANNELS: int = 1  # microphone channel
 AUDIO_SAMPLE_RATE: int = 44100
-AUDIO_RECORD_SECONDS: int = 5
+AUDIO_RECORD_SECONDS: int = 60
 
 def record_audio(duration: int, folder: str="."):
   py_audio = pyaudio.PyAudio()

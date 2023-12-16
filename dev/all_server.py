@@ -1,16 +1,12 @@
 # V4 this sample by restful api trigger and store the result to pg, modify for mic-710aix
-import pandas as pd, silic
+import pandas as pd
+import silic
 import os
 from minio import Minio
 from flask import Flask, request, jsonify
-from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String
+import sqlalchemy as db
 from datetime import datetime
 import shutil
-
-# from IPython.display import Image
-# from google.colab import files
-
-app = Flask(__name__)
 
 RESULT_BASE_PATH: str = os.path.join(os.getcwd(), "result_silic")
 PG_CSV_FILE_PATH: str = RESULT_BASE_PATH + "/label/labels.csv"
@@ -24,46 +20,49 @@ SILIC_MODEL: str = "./exp29"
 SILIC_STEP: int = 1000
 SILIC_CONF_THRES: float = 0.5
 
+# MINIO_ENDPOINT: str = 'blobstore.education.wise-paas.com:8888'
+# ACCESS_KEY: str = '836f6e5b71294a50989599f54a63f628'
+# SECRET_KEY: str = 'xqDXwM57kYuA01ptpToWbtuj5SzSKAFzc'
+# BUCKET_NAME: str = 'ntutony-demo'
 MINIO_ENDPOINT: str = "localhost:9010"
 ACCESS_KEY: str = "admin"
 SECRET_KEY: str = "987654321"
 BUCKET_NAME: str = "silic-bucket"
 
-
-
+app = Flask(__name__)
 
 @app.route("/silic", methods=["POST"])
 def slic_browser():
-  home_base_path = os.path.join(
-    os.getcwd(),
-    datetime.now().strftime("%Y-%m-%d")
-    )
+  current_datetime: str = datetime.now().strftime("%Y-%m-%d")
+  home_base_path = os.path.join(os.getcwd(), current_datetime)
   try:
     # 获取传入的文件名
     file_name = request.json["file_name"]
-    # file_name = request.form.get('file_name')
     download_path = os.path.join(home_base_path, file_name)
     print(f"file_path: {file_name}")
     print(f"download_path: {download_path}")
 
-    # Use local record file
-    current_date = datetime.now().strftime("%Y-%m-%d")
-    folder = os.getcwd()
-    localfile_path = os.path.join(folder, current_date, file_name)
-    print(f"localfile_path: {localfile_path}")
-    shutil.copy(localfile_path, download_path)
+    ########## Use local record file ##########
+    # folder = os.getcwd()
+    # localfile_path = os.path.join(folder, current_datetime, file_name)
+    # print(f"localfile_path: {localfile_path}")
+    # shutil.copy(localfile_path, download_path)
 
-    # download the file from S3
-    minio_client = Minio(
+    ########## Download the file from S3 ##########
+    minio_client = Minio(   
       endpoint=MINIO_ENDPOINT, 
       access_key=ACCESS_KEY, 
       secret_key=SECRET_KEY, 
       secure=False
     )
-    minio_client.fget_object(BUCKET_NAME, file_name, download_path)
+    minio_client.fget_object(
+      bucket_name=BUCKET_NAME,
+      object_name=file_name, 
+      file_path=download_path
+      )
 
     # classed by silic
-    os.makedirs(download_path, exist_ok=True)     # 确保下载目录存在
+    os.makedirs(home_base_path, exist_ok=True)     # 确保下载目录存在
 
     silic.browser(
       source=download_path,
@@ -75,10 +74,10 @@ def slic_browser():
     )  
 
     # 调用函数删除特定类型的文件（例如删除路径'./samples3/'下的file）
-    delete_specific_files(home_base_path, file_name)
-    shutil.rmtree(os.path.join(RESULT_BASE_PATH, "audio"))
-    shutil.rmtree(os.path.join(RESULT_BASE_PATH, "linear"))
-    shutil.rmtree(os.path.join(RESULT_BASE_PATH, "rainbow"))
+    # delete_specific_files(home_base_path, file_name)
+    # shutil.rmtree(os.path.join(RESULT_BASE_PATH, "audio"))
+    # shutil.rmtree(os.path.join(RESULT_BASE_PATH, "linear"))
+    # shutil.rmtree(os.path.join(RESULT_BASE_PATH, "rainbow"))
 
     upload_data_to_postgresql(
       csv_file_path=PG_CSV_FILE_PATH,
@@ -106,9 +105,9 @@ def delete_specific_files(directory: str, file_extension: str):
       file_path = os.path.join(directory, file)
       try:
         os.remove(file_path)
-        print("remove the download file success...")
+        print("Downloaded file removed successfully.")
       except Exception as e:
-        print(f"Error. Please make sure {file_path} is closed. [log: {e}]")
+        print(f"Error! Please ensure {file_path} is closed. [log: {e}]")
 
 
 # Store the result to pg
@@ -123,9 +122,14 @@ def upload_data_to_postgresql(
     # 读取 labels.csv 文件
     df = pd.read_csv(csv_file_path)
     # 连接到 PostgreSQL 数据库
-    engine = create_engine(database_url)
-    # 创建一个新的Schema对象
-    schema = MetaData(schema=schema_name)
+    engine = db.create_engine(database_url)
+    # metadata = db.MetaData()
+    inspector = db.inspect(engine)
+    if schema_name not in inspector.get_schema_names():
+      engine.execute(db.schema.CreateSchema(schema_name))
+      # optional. set the default schema to the new schema:
+      engine.dialect.default_schema_name = schema_name
+
     # 将数据上传至 PostgreSQL 数据库, 'replace'刪除取代現有資料, 'append'加入新的資料
     df.to_sql(
       name=table_name, 
@@ -135,18 +139,12 @@ def upload_data_to_postgresql(
       # if_exists=if_exists, 
       index=False
     )
-    print("Store to PostgreSQL success!")
+    print("Store to PostgreSQL successfully!")
   except Exception as e:
     print(f"Error uploading data to PostgreSQL: {str(e)}")
 
 
 if __name__ == "__main__":
-  # Connect to S3 parament
-  # minio_endpoint = "blobstore.education.wise-paas.com:8888"
-  # access_key = "836f6e5b71294a50989599f54a63f628"
-  # secret_key = "xqDXwM57kYuA01ptpToWbtuj5SzSKAFzc"
-  # bucket_name = "ntutony-demo"
-
   # file_name = 'recording_20230804_170020.mp3'    # get file name
   # file_path = file_name                          # get file path
   # download_path = "./samples3/"+file_name
