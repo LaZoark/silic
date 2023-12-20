@@ -33,7 +33,15 @@ MINIO_ENDPOINT: str = "localhost:9010"
 ACCESS_KEY: str = "admin"
 SECRET_KEY: str = "987654321"
 BUCKET_NAME: str = "silic-bucket"
-MACHINE_ID: typing.List[int|str] = 99
+
+MACHINE_PREFIX: str = "NTU"
+MACHINE_ID: typing.List[int|str] = 2
+MACHINE_LOCATION: typing.Literal["XT", "HS", "DG"] = "XT"
+'''
+NTU_XT1, XT2 (溪頭)
+NTU_HS1 (和社)
+NTU_DG (對高岳)
+'''
 
 AUDIO_FRAMES_PER_BUFFER: int = 1024
 AUDIO_FORMAT: int = pyaudio.paInt16
@@ -69,8 +77,9 @@ def record_audio(duration: int, folder: str="."):
     os.makedirs(folder_path)
 
   # Save audio file locally
-  dtime = int(datetime.now().timestamp() * 1000)    # Milliseconds (1/1,000 second)
-  filename = f"recording_M{MACHINE_ID}_" + str(dtime) + AUDIO_FILE_FORMAT
+  # dtime = int(datetime.now().timestamp() * 1000)    # Milliseconds (1/1,000 second)
+  dtime = datetime.now().strftime("%Y%m%d_%H%M%S")
+  filename = f"{MACHINE_PREFIX}_{MACHINE_LOCATION}{MACHINE_ID}_" + str(dtime) + AUDIO_FILE_FORMAT
   audio_file = os.path.join(folder_path, filename)
   wf = wave.open(audio_file, "wb")
   wf.setnchannels(MIC_CHANNELS)
