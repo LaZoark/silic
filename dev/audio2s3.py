@@ -28,8 +28,9 @@ asound.snd_lib_error_set_handler(c_error_handler)
 # ACCESS_KEY: str = '836f6e5b71294a50989599f54a63f628'
 # SECRET_KEY: str = 'xqDXwM57kYuA01ptpToWbtuj5SzSKAFzc'
 # BUCKET_NAME: str = 'ntutony-demo'
-# MINIO_ENDPOINT: str = "140.113.13.93:9010"
-MINIO_ENDPOINT: str = "localhost:9010"
+MINIO_ENDPOINT: str = "140.113.13.93:9010"
+# MINIO_ENDPOINT: str = "s3.ed716.duckdns.org:9010"
+# MINIO_ENDPOINT: str = "localhost:9010"
 ACCESS_KEY: str = "admin"
 SECRET_KEY: str = "987654321"
 BUCKET_NAME: str = "silic-bucket"
@@ -48,7 +49,7 @@ AUDIO_FORMAT: int = pyaudio.paInt16
 AUDIO_FILE_FORMAT: str = ".wav"
 MIC_CHANNELS: int = 1  # microphone channel
 AUDIO_SAMPLE_RATE: int = 44100
-AUDIO_RECORD_SECONDS: int = 60
+AUDIO_RECORD_SECONDS: int = 300
 
 def record_audio(duration: int, folder: str="."):
   py_audio = pyaudio.PyAudio()
