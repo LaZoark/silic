@@ -1,3 +1,9 @@
+"""
+This script provides the following functions:
+1. records sound from a (USB) microphone 
+2. uploads it to s3 blub (using Minio)
+3. pushes recorded audio file_name to URL_POST_ENDPOINT
+"""
 # V4 為新增POST API 功能, modify for mic-710aix
 import os
 import time
@@ -28,8 +34,10 @@ asound.snd_lib_error_set_handler(c_error_handler)
 # ACCESS_KEY: str = '836f6e5b71294a50989599f54a63f628'
 # SECRET_KEY: str = 'xqDXwM57kYuA01ptpToWbtuj5SzSKAFzc'
 # BUCKET_NAME: str = 'ntutony-demo'
+# URL_POST_ENDPOINT: str = "http://127.0.0.1:5000/silic"
+URL_POST_ENDPOINT: str = "http://ed716.duckdns.org:5000/silic"
 MINIO_ENDPOINT: str = "140.113.13.93:9010"
-# MINIO_ENDPOINT: str = "s3.ed716.duckdns.org:9010"
+# MINIO_ENDPOINT: str = "ed716.duckdns.org:8888"
 # MINIO_ENDPOINT: str = "localhost:9010"
 ACCESS_KEY: str = "admin"
 SECRET_KEY: str = "987654321"
@@ -49,7 +57,8 @@ AUDIO_FORMAT: int = pyaudio.paInt16
 AUDIO_FILE_FORMAT: str = ".wav"
 MIC_CHANNELS: int = 1  # microphone channel
 AUDIO_SAMPLE_RATE: int = 44100
-AUDIO_RECORD_SECONDS: int = 300
+# AUDIO_SAMPLE_RATE: int = 48000
+AUDIO_RECORD_SECONDS: int = 3
 
 def record_audio(duration: int, folder: str="."):
   py_audio = pyaudio.PyAudio()
@@ -127,13 +136,12 @@ def upload_to_minio(filepath):
 
 
 def post_byrestful(filename):
-  url = "http://127.0.0.1:5000/silic"
-  file_name = filename
-  data = {"file_name": file_name}
+  # url = "http://127.0.0.1:5000/silic"
+  url = URL_POST_ENDPOINT
+  data = {"file_name": filename}
   response = requests.post(url, json=data)
-
   if response.status_code == 200:
-    print("POST success")
+    print("POST success", response.json())
   else:
     print("An error occurred:", response.json())
 
