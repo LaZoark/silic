@@ -770,7 +770,8 @@ def browser(
       )
 
   if all_labels.shape[0] == 0:
-    print("No sounds found!")
+    # print("No sounds found!")
+    pass
   else:
     all_labels.to_csv(
       os.path.join(lable_path, "labels.csv"), index=False, encoding="utf-8-sig"

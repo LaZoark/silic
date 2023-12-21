@@ -38,7 +38,6 @@ def slic_browser():
   current_datetime: str = datetime.now().strftime("%Y-%m-%d")
   home_base_path = os.path.join(os.getcwd(), current_datetime)
   try:
-    # 获取传入的文件名
     file_name = request.json["file_name"]
     download_path = os.path.join(home_base_path, file_name)
     print(f"file_path: {file_name}")
