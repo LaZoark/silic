@@ -137,8 +137,8 @@ def upload_data_to_postgresql(
       name=table_name, 
       con=engine, 
       schema=schema_name, 
-      if_exists="append", 
-      # if_exists=if_exists, 
+      # if_exists="append", 
+      if_exists=if_exists, 
       index=False
     )
     print("Store to PostgreSQL successfully!")
