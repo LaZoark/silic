@@ -45,7 +45,7 @@ BUCKET_NAME: str = "silic-bucket"
 
 MACHINE_PREFIX: str = "NTU"
 MACHINE_ID: typing.List[int|str] = 2
-MACHINE_LOCATION: typing.Literal["XT", "HS", "DG"] = "XT"
+MACHINE_LOCATION: typing.Literal["XT", "HS", "DG"] = "DG"
 '''
 NTU_XT1, XT2 (溪頭)
 NTU_HS1 (和社)
@@ -58,7 +58,7 @@ AUDIO_FILE_FORMAT: str = ".wav"
 MIC_CHANNELS: int = 1  # microphone channel
 AUDIO_SAMPLE_RATE: int = 44100
 # AUDIO_SAMPLE_RATE: int = 48000
-AUDIO_RECORD_SECONDS: int = 3
+AUDIO_RECORD_SECONDS: int = 300
 
 def record_audio(duration: int, folder: str="."):
   py_audio = pyaudio.PyAudio()

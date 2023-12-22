@@ -85,7 +85,8 @@ def slic_browser():
       database_url=PG_DATABASE_URL,
       schema_name=PG_SCHEMA_NAME,
       table_name=PG_TABLE_NAME,
-      if_exists="replace"
+      # if_exists="replace"
+      if_exists="append"
     )
     return (
       jsonify({"message": "Successfully processed the file and restore to pg archive."}),
@@ -117,7 +118,7 @@ def upload_data_to_postgresql(
   database_url: str,
   schema_name: str,
   table_name: str,
-  if_exists: str="replace"
+  if_exists: str="append"
 ):
   try:
     # 读取 labels.csv 文件
@@ -136,7 +137,6 @@ def upload_data_to_postgresql(
       name=table_name, 
       con=engine, 
       schema=schema_name, 
-      # if_exists="append", 
       if_exists=if_exists, 
       index=False
     )
