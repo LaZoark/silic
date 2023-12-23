@@ -15,6 +15,7 @@ from minio import Minio
 # from minio.error import ResponseError //"ResponseError" 沒有在使用了
 from minio.error import InvalidResponseError
 import typing
+from pydub import AudioSegment
 
 ### Suppressing pyaudio error logs
 from ctypes import *
@@ -54,11 +55,12 @@ NTU_DG (對高岳)
 
 AUDIO_FRAMES_PER_BUFFER: int = 1024
 AUDIO_FORMAT: int = pyaudio.paInt16
-AUDIO_FILE_FORMAT: str = ".wav"
 MIC_CHANNELS: int = 1  # microphone channel
 AUDIO_SAMPLE_RATE: int = 44100
 # AUDIO_SAMPLE_RATE: int = 48000
-AUDIO_RECORD_SECONDS: int = 300
+AUDIO_RECORD_SECONDS: int = 5
+AUDIO_USING_FLAC: bool = True
+AUDIO_FILE_FORMAT: typing.Literal[".wav", ".flac"] = ".flac" if AUDIO_USING_FLAC else ".wav"
 
 def record_audio(duration: int, folder: str="."):
   py_audio = pyaudio.PyAudio()
@@ -98,17 +100,18 @@ def record_audio(duration: int, folder: str="."):
     wf.setframerate(AUDIO_SAMPLE_RATE)
     wf.writeframes(b"".join(frames))
 
+  if AUDIO_USING_FLAC:
+    _song = AudioSegment.from_wav(audio_file)
+    _song.export(audio_file, format="FLAC")
 
-  # upload to minio
   upload_to_minio(audio_file)
-  # POST API
   try:
     post_byrestful(filename)
   except Exception as e:
     print(f"[!!] {e}")
 
 
-def upload_to_minio(filepath):
+def upload_to_minio(filepath: str):
   minio_client = Minio(
     endpoint=MINIO_ENDPOINT, 
     access_key=ACCESS_KEY, 
@@ -128,7 +131,7 @@ def upload_to_minio(filepath):
         object_name=object_name, 
         data=file_data, 
         length=file_stat.st_size,
-        content_type='audio/wav'
+        content_type="audio/flac" if AUDIO_USING_FLAC else "audio/wav"
       )
     print(f"檔案 {filepath} 已成功上傳到 {BUCKET_NAME}/{object_name}")
   except InvalidResponseError as err:
