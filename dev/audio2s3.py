@@ -91,16 +91,16 @@ def record_audio(duration: int, folder: str="."):
   dtime = datetime.now().strftime("%Y%m%d_%H%M%S")
   filename = f"{MACHINE_PREFIX}_{MACHINE_LOCATION}{MACHINE_ID}_" + str(dtime) + AUDIO_FILE_FORMAT
   audio_file = os.path.join(folder_path, filename)
-  wf = wave.open(audio_file, "wb")
-  wf.setnchannels(MIC_CHANNELS)
-  wf.setsampwidth(py_audio.get_sample_size(AUDIO_FORMAT))
-  wf.setframerate(AUDIO_SAMPLE_RATE)
-  wf.writeframes(b"".join(frames))
-  wf.close()
+  
+  with wave.open(audio_file, "wb") as wf:
+    wf.setnchannels(MIC_CHANNELS)
+    wf.setsampwidth(py_audio.get_sample_size(AUDIO_FORMAT))
+    wf.setframerate(AUDIO_SAMPLE_RATE)
+    wf.writeframes(b"".join(frames))
+
 
   # upload to minio
   upload_to_minio(audio_file)
-
   # POST API
   try:
     post_byrestful(filename)
