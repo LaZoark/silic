@@ -9,7 +9,7 @@ readme = "README.md"
 python = ">=3.10,<3.12"
 
 
-
+torch = "^2.0.0"
 absl-py = "1.4.0"
 asttokens = "2.2.1"
 backcall = "0.2.0"
