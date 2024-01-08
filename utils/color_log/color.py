@@ -55,11 +55,10 @@ NOTSET = 0
 class ColoredLogger(logging.Logger):
     # FORMAT = "[$BOLD%(name)-20s$RESET][%(levelname)-18s]  %(message)s ($BOLD%(filename)s$RESET:%(lineno)d)"
     # FORMAT = "[$BOLD%(name)s$RESET][%(levelname)s] %(message)s ($BOLD%(filename)s$RESET:%(lineno)d)"
-    FORMAT = "[%(levelname)s] %(message)s ($BOLD%(filename)s$RESET:%(lineno)d)"
+    FORMAT = "[%(levelname)s] %(message)s ($BOLD%(pathname)s$RESET:%(lineno)d)"
     COLOR_FORMAT = formatter_message(FORMAT, True)
-    def __init__(self, name):
-        logging.Logger.__init__(self, name, logging.DEBUG)                
-
+    def __init__(self, name: str, level: int=logging.INFO):
+        logging.Logger.__init__(self, name, level=level)
         color_formatter = ColoredFormatter(self.COLOR_FORMAT)
 
         console = logging.StreamHandler()
@@ -141,11 +140,9 @@ def tt_black(skk):
 
 
 if __name__ == "__main__":
-  # from color_log import color
-  # logging = color.setup(name=__name__, level=color.DEBUG)
   logging.setLoggerClass(ColoredLogger)
-  color_log = logging.getLogger("Sniffer")
-  color_log.setLevel(logging.DEBUG)
+#   color_log = logging.getLogger("Sniffer")
+#   color_log.setLevel(logging.DEBUG)
 
 #   color_log.debug("test")
 #   color_log.info("test")
@@ -156,7 +153,9 @@ if __name__ == "__main__":
 #   print_format_table()
   print(bg_yellow('test quick setup: '))
 
-  color_logger = setup()
+  color_logger = setup(name=__name__, level=INFO)
+#   color_logger = setup(name=__name__, level=DEBUG)
+#   color_logger = setup(name=__name__, level=ERROR)
   color_logger.debug('Demo log ==> "debug"')
   color_logger.info('Demo log ==> "info"')
   color_logger.warning('Demo log ==> "warning"')
