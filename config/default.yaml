@@ -1,0 +1,40 @@
+version:
+  v: 1.0.0
+pg:
+  database_url: "postgresql://silic:silic@140.113.13.93:5432/silic"
+  schema_name: "silic"
+  table_name: "silic_labels_table"
+  targetclasses_m: "1, 11, 12, 28, 29, 35, 40, 41, 72, 73, 76, 77, 78, 85, 86, 103, 105, 110, 126, 187, 199, 202, 235, 290, 307, 308, 313, 315, 316, 320, 330, 332, 333, 340, 341, 342, 344, 383, 419, 420, 459, 463, 465, 468, 553, 554, 555, 563, 565, 566"
+
+silic:
+  model: "./exp29"
+  step: 1000
+  conf_thres: 0.5
+
+minio:  # s3 blub
+  # endpoint: "localhost:9010"
+  endpoint: "140.113.13.93:9010"
+  access_key: "admin"
+  secret_key: "987654321"
+  bucket_name: "silic-bucket"
+
+mic:  # microphone channel
+  channels: 1 
+
+api:
+  url_post_endpoint: "http://ed716.duckdns.org:5000/silic"
+
+device:
+# NTU_XT1, XT2 (溪頭)
+# NTU_HS1 (和社)
+# NTU_DG1 (對高岳)
+  prefix: NTU
+  id: 2
+  location: DG
+
+audio:
+  frames_per_buffer: 1024
+  sample_rate: 44100 #48000
+  record_seconds: 5
+  using_flac: true # default using .wav
+  # FORMAT: pyaudio.paInt16
