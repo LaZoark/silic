@@ -16,6 +16,13 @@ from minio import Minio
 from minio.error import InvalidResponseError
 from pydub import AudioSegment
 
+from utils.params import Configuration
+from utils.color_log import color
+logging = color.setup(name=__name__, level=color.DEBUG)
+CONFIG_PATH: str = os.path.join(os.getcwd(), "config")
+cfg = Configuration(config_path=CONFIG_PATH)
+config: dict = cfg.read_yaml(fname="default.yaml", verbose=True)
+
 ### Suppressing pyaudio error logs
 from ctypes import *
 # From alsa-lib Git 3fd4ab9be0db7c7430ebd258f2717a976381715d
@@ -27,38 +34,20 @@ c_error_handler = ERROR_HANDLER_FUNC(py_error_handler)
 asound = cdll.LoadLibrary('libasound.so')
 asound.snd_lib_error_set_handler(c_error_handler) # Set error handler
 
-# Set error handler
-asound.snd_lib_error_set_handler(c_error_handler)
-
-# MINIO_ENDPOINT: str = 'blobstore.education.wise-paas.com:8888'
-# ACCESS_KEY: str = '836f6e5b71294a50989599f54a63f628'
-# SECRET_KEY: str = 'xqDXwM57kYuA01ptpToWbtuj5SzSKAFzc'
-# BUCKET_NAME: str = 'ntutony-demo'
-# URL_POST_ENDPOINT: str = "http://127.0.0.1:5000/silic"
-URL_POST_ENDPOINT: str = "http://ed716.duckdns.org:5000/silic"
-MINIO_ENDPOINT: str = "140.113.13.93:9010"
-# MINIO_ENDPOINT: str = "ed716.duckdns.org:8888"
-# MINIO_ENDPOINT: str = "localhost:9010"
-ACCESS_KEY: str = "admin"
-SECRET_KEY: str = "987654321"
-BUCKET_NAME: str = "silic-bucket"
-
-MACHINE_PREFIX: str = "NTU"
-MACHINE_ID: typing.List[int|str] = 2
-MACHINE_LOCATION: typing.Literal["XT", "HS", "DG"] = "DG"
-'''
-NTU_XT1, XT2 (溪頭)
-NTU_HS1 (和社)
-NTU_DG (對高岳)
-'''
-
-AUDIO_FRAMES_PER_BUFFER: int = 1024
+URL_POST_ENDPOINT: str = config["api"]["url_post_endpoint"]
+MINIO_ENDPOINT: str = config["minio"]["endpoint"]
+ACCESS_KEY: str = config["minio"]["access_key"]
+SECRET_KEY: str = config["minio"]["secret_key"]
+BUCKET_NAME: str = config["minio"]["bucket_name"]
+MACHINE_PREFIX: str = config["device"]["prefix"]
+MACHINE_ID: typing.List[int|str] = config["device"]["id"]
+MACHINE_LOCATION: typing.Literal["XT", "HS", "DG"] = config["device"]["location"]
+MIC_CHANNELS: int = config["mic"]["channels"]  # microphone channel
+AUDIO_FRAMES_PER_BUFFER: int = config["audio"]["frames_per_buffer"]
+AUDIO_SAMPLE_RATE: int = config["audio"]["sample_rate"]
+AUDIO_RECORD_SECONDS: int = config["audio"]["record_seconds"]
+AUDIO_USING_FLAC: bool = config["audio"]["using_flac"]
 AUDIO_FORMAT: int = pyaudio.paInt16
-MIC_CHANNELS: int = 1  # microphone channel
-AUDIO_SAMPLE_RATE: int = 44100
-# AUDIO_SAMPLE_RATE: int = 48000
-AUDIO_RECORD_SECONDS: int = 5
-AUDIO_USING_FLAC: bool = True
 AUDIO_FILE_FORMAT: typing.Literal[".wav", ".flac"] = ".flac" if AUDIO_USING_FLAC else ".wav"
 
 def record_audio(duration: int, folder: str="."):

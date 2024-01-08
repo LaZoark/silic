@@ -8,28 +8,26 @@ import sqlalchemy as db
 from datetime import datetime
 import shutil
 
+from utils.params import Configuration
+from utils.color_log import color
+logging = color.setup(name=__name__, level=color.DEBUG)
+CONFIG_PATH: str = os.path.join(os.getcwd(), "config")
+cfg = Configuration(config_path=CONFIG_PATH)
+config: dict = cfg.read_yaml(fname="default.yaml", verbose=True)
+
 RESULT_BASE_PATH: str = os.path.join(os.getcwd(), "result_silic")
 PG_CSV_FILE_PATH: str = RESULT_BASE_PATH + "/label/labels.csv"
-# PG_DATABASE_URL: str = "postgresql://188ae346-2065-47af-8df3-a14008cb7f29:ng7t27G4ciAwShQHNN72n0Lce@60.250.255.162:5432/silic-result"
-# PG_DATABASE_URL: str = "postgresql://silic:silic@localhost:5432/silic"
-PG_DATABASE_URL: str = "postgresql://silic:silic@140.113.13.93:5432/silic"
-PG_SCHEMA_NAME: str = "silic"
-PG_TABLE_NAME: str = "silic_labels_table"
-PG_TARGETCLASSES_M: str = "1, 11, 12, 28, 29, 35, 40, 41, 72, 73, 76, 77, 78, 85, 86, 103, 105, 110, 126, 187, 199, 202, 235, 290, 307, 308, 313, 315, 316, 320, 330, 332, 333, 340, 341, 342, 344, 383, 419, 420, 459, 463, 465, 468, 553, 554, 555, 563, 565, 566"
-
-SILIC_MODEL: str = "./exp29"
-SILIC_STEP: int = 1000
-SILIC_CONF_THRES: float = 0.5
-
-# MINIO_ENDPOINT: str = 'blobstore.education.wise-paas.com:8888'
-# ACCESS_KEY: str = '836f6e5b71294a50989599f54a63f628'
-# SECRET_KEY: str = 'xqDXwM57kYuA01ptpToWbtuj5SzSKAFzc'
-# BUCKET_NAME: str = 'ntutony-demo'
-# MINIO_ENDPOINT: str = "localhost:9010"
-MINIO_ENDPOINT: str = "140.113.13.93:9010"
-ACCESS_KEY: str = "admin"
-SECRET_KEY: str = "987654321"
-BUCKET_NAME: str = "silic-bucket"
+PG_DATABASE_URL: str = config["pg"]["database_url"]
+PG_SCHEMA_NAME: str = config["pg"]["schema_name"]
+PG_TABLE_NAME: str = config["pg"]["table_name"]
+PG_TARGETCLASSES_M: str = config["pg"]["targetclasses_m"]
+SILIC_MODEL: str = config["silic"]["model"]
+SILIC_STEP: int = config["silic"]["step"]
+SILIC_CONF_THRES: float = config["silic"]["conf_thres"]
+MINIO_ENDPOINT: str = config["minio"]["endpoint"]
+ACCESS_KEY: str = config["minio"]["access_key"]
+SECRET_KEY: str = config["minio"]["secret_key"]
+BUCKET_NAME: str = config["minio"]["bucket_name"]
 
 app = Flask(__name__)
 
@@ -63,7 +61,7 @@ def slic_browser():
       )
 
     # classed by silic
-    os.makedirs(home_base_path, exist_ok=True)     # 确保下载目录存在
+    os.makedirs(home_base_path, exist_ok=True)
 
     silic.browser(
       source=download_path,
@@ -99,7 +97,6 @@ def slic_browser():
 
 # delete the download file
 def delete_specific_files(directory: str, file_extension: str):
-  # 获取路径下的所有文件和目录列表
   file_list = os.listdir(directory)
   # 删除特定类型的文件
   for file in file_list:
@@ -125,7 +122,6 @@ def upload_data_to_postgresql(
     df = pd.read_csv(csv_file_path)
     # 连接到 PostgreSQL 数据库
     engine = db.create_engine(database_url)
-    # metadata = db.MetaData()
     inspector = db.inspect(engine)
     if schema_name not in inspector.get_schema_names():
       engine.execute(db.schema.CreateSchema(schema_name))
