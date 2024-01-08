@@ -10,24 +10,23 @@ import time
 import pyaudio
 import wave
 import requests
+import typing
 from datetime import datetime
 from minio import Minio
-# from minio.error import ResponseError //"ResponseError" 沒有在使用了
 from minio.error import InvalidResponseError
-import typing
 from pydub import AudioSegment
 
 ### Suppressing pyaudio error logs
 from ctypes import *
 # From alsa-lib Git 3fd4ab9be0db7c7430ebd258f2717a976381715d
-# $ grep -rn snd_lib_error_handler_t
-# include/error.h:59:typedef void (*snd_lib_error_handler_t)(const char *file, int line, const char *function, int err, const char *fmt, ...) /* __attribute__ ((format (printf, 5, 6))) */;
 # Define our error handler type
 ERROR_HANDLER_FUNC = CFUNCTYPE(None, c_char_p, c_int, c_char_p, c_int, c_char_p)
 def py_error_handler(filename, line, function, err, fmt):
   pass
 c_error_handler = ERROR_HANDLER_FUNC(py_error_handler)
 asound = cdll.LoadLibrary('libasound.so')
+asound.snd_lib_error_set_handler(c_error_handler) # Set error handler
+
 # Set error handler
 asound.snd_lib_error_set_handler(c_error_handler)
 
@@ -139,7 +138,6 @@ def upload_to_minio(filepath: str):
 
 
 def post_byrestful(filename):
-  # url = "http://127.0.0.1:5000/silic"
   url = URL_POST_ENDPOINT
   data = {"file_name": filename}
   response = requests.post(url, json=data)
@@ -156,7 +154,9 @@ if __name__ == "__main__":
   # folder = '/home/m/audio_record_data/'                              # 於/home/mic-710aix/目錄下
   # folder = "/mnt/usb/audio_record_data/"  # 於/mnt/usb/目錄下
 
-  for i in range(6000):
-    # print(f'{dtime = }')
-    # time.sleep(1)
+  # for i in range(6000):
+  #   # print(f'{dtime = }')
+  #   # time.sleep(1)
+  #   record_audio(AUDIO_RECORD_SECONDS)
+  while 1:
     record_audio(AUDIO_RECORD_SECONDS)

@@ -1,3 +1,5 @@
+'''Simple demo for audio compression (wav -> flac)
+'''
 from pydub import AudioSegment
 
 song = AudioSegment.from_wav("../sample/ZZG01_20210501_070000.wav")
