@@ -1,7 +1,7 @@
 import yaml
 import os
 from utils.color_log import color
-logging = color.setup(name=__name__, level=color.DEBUG)
+logging = color.setup(name=__name__, level=color.INFO)
 
 class Configuration:
   def __init__(self, config_path: str) -> None:

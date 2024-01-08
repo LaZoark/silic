@@ -36,5 +36,6 @@ audio:
   frames_per_buffer: 1024
   sample_rate: 44100 #48000
   record_seconds: 5
-  using_flac: true # default using .wav
+  # using_flac: true # default using .wav
+  using_flac: false # default using .wav
   # FORMAT: pyaudio.paInt16

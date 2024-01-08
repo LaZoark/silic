@@ -9,7 +9,7 @@ from flask import Flask, request, jsonify
 import sqlalchemy as db
 from datetime import datetime
 import shutil
-logging = color.setup(name=__name__, level=color.DEBUG)
+logging = color.setup(name=__name__, level=color.INFO)
 CONFIG_PATH: str = os.path.join(os.getcwd(), "config")
 cfg = Configuration(config_path=CONFIG_PATH)
 config: dict = cfg.read_yaml(fname="default.yaml", verbose=True)
@@ -73,10 +73,10 @@ def slic_browser():
     )  
 
     # 调用函数删除特定类型的文件（例如删除路径'./samples3/'下的file）
-    # delete_specific_files(home_base_path, file_name)
-    # shutil.rmtree(os.path.join(RESULT_BASE_PATH, "audio"))
-    # shutil.rmtree(os.path.join(RESULT_BASE_PATH, "linear"))
-    # shutil.rmtree(os.path.join(RESULT_BASE_PATH, "rainbow"))
+    delete_specific_files(home_base_path, file_name)
+    shutil.rmtree(os.path.join(RESULT_BASE_PATH, "audio"))
+    shutil.rmtree(os.path.join(RESULT_BASE_PATH, "linear"))
+    shutil.rmtree(os.path.join(RESULT_BASE_PATH, "rainbow"))
 
     upload_data_to_postgresql(
       csv_file_path=PG_CSV_FILE_PATH,
