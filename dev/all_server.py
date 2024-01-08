@@ -1,19 +1,19 @@
 # V4 this sample by restful api trigger and store the result to pg, modify for mic-710aix
-import pandas as pd
-import silic
 import os
+from utils.params import Configuration
+from utils.color_log import color
+import silic
+import pandas as pd
 from minio import Minio
 from flask import Flask, request, jsonify
 import sqlalchemy as db
 from datetime import datetime
 import shutil
-
-from utils.params import Configuration
-from utils.color_log import color
 logging = color.setup(name=__name__, level=color.DEBUG)
 CONFIG_PATH: str = os.path.join(os.getcwd(), "config")
 cfg = Configuration(config_path=CONFIG_PATH)
 config: dict = cfg.read_yaml(fname="default.yaml", verbose=True)
+
 
 RESULT_BASE_PATH: str = os.path.join(os.getcwd(), "result_silic")
 PG_CSV_FILE_PATH: str = RESULT_BASE_PATH + "/label/labels.csv"
