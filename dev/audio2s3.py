@@ -47,6 +47,7 @@ AUDIO_FRAMES_PER_BUFFER: int = config["audio"]["frames_per_buffer"]
 AUDIO_SAMPLE_RATE: int = config["audio"]["sample_rate"]
 AUDIO_RECORD_SECONDS: int = config["audio"]["record_seconds"]
 AUDIO_USING_FLAC: bool = config["audio"]["using_flac"]
+AUDIO_SAVE_FOLDER_PATH: bool = config["audio"]["save_folder_path"]
 AUDIO_FORMAT: int = pyaudio.paInt16
 AUDIO_FILE_FORMAT: typing.Literal[".wav", ".flac"] = ".flac" if AUDIO_USING_FLAC else ".wav"
 
@@ -148,4 +149,4 @@ if __name__ == "__main__":
   #   # time.sleep(1)
   #   record_audio(AUDIO_RECORD_SECONDS)
   while 1:
-    record_audio(AUDIO_RECORD_SECONDS)
+    record_audio(AUDIO_RECORD_SECONDS, folder=AUDIO_SAVE_FOLDER_PATH)
