@@ -14,3 +14,12 @@ echo 'mount to /media/silic'
 
 #!/bin/sh
 cd ~/lobby/silic/; ~/.local/bin/poetry run python dev/audio2s3.py
+
+
+### inside the crontab:
+# @reboot cd ~/lobby/silic/; poetry run python dev/audio2s3.py
+@reboot /etc/init.d/mount-usb
+# @reboot cd ~/lobby/silic/; /home/ntupi/.local/bin/poetry run python dev/audio2s3.py >/tmp/ppylog.log &>/tmp/troubleshooting.log
+@reboot (sleep 60 && cd ~/lobby/silic/ && /home/ntupi/.local/bin/poetry run python dev/audio2s3.py) >/tmp/ppylog.log 2>&1
+# */1 * * * * (sleep 5 && lsusb) >/tmp/ppylog.log 2>&1
+# */1 * * * * (cd ~/lobby/silic/; /home/ntupi/.local/bin/poetry run python test.py) >/tmp/troubleshooting.log 2>&1
