@@ -39,3 +39,5 @@ audio:
   # using_flac: true # default using .wav
   using_flac: false # default using .wav
   # FORMAT: pyaudio.paInt16
+  save_folder_path: "/media/silic"
+  
