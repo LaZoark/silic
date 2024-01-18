@@ -58,6 +58,7 @@ def record_audio(duration: int, folder: str="."):
     channels=MIC_CHANNELS, 
     rate=AUDIO_SAMPLE_RATE, 
     input=True, 
+    # input_device_index=3,
     frames_per_buffer=AUDIO_FRAMES_PER_BUFFER
   )
   print("Recording audio...")
