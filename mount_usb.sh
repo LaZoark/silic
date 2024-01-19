@@ -20,7 +20,7 @@ cd ~/lobby/silic/; ~/.local/bin/poetry run python dev/audio2s3.py
 # Mounting the USB
 @reboot /etc/init.d/mount-usb >/tmp/mmount.log 2>&1
 # Run the audio script
-@reboot (sleep 5 && cd ~/lobby/silic/ && XDG_RUNTIME_DIR=/run/user/$(id -u) ~/.local/bin/poetry run python dev/audio2s3.py) >/tmp/ppylog.log 2>&1
+@reboot (sleep 25 && cd ~/lobby/silic/ && XDG_RUNTIME_DIR=/run/user/$(id -u) ~/.local/bin/poetry run python dev/audio2s3.py) >/tmp/ppylog.log 2>&1
 # For testing
 */1 * * * * (cd ~/lobby/silic/ && XDG_RUNTIME_DIR=/run/user/$(id -u) ~/.local/bin/poetry run python dev/test_pyaudio.py) >/tmp/ppylog.log 2>&1
 
@@ -29,7 +29,7 @@ cd ~/lobby/silic/; ~/.local/bin/poetry run python dev/audio2s3.py
 @reboot (sleep 5 && /etc/init.d/mount-usb) >/tmp/mmount.log 2>&1
 
 # Run the audio script
-@reboot (sleep 15 && cd ~/lobby/silic/ && ~/.local/bin/poetry run python dev/audio2s3.py) >/tmp/ppylog.log 2>&1
+@reboot (sleep 25 && cd ~/lobby/silic/ && ~/.local/bin/poetry run python dev/audio2s3.py) >/tmp/ppylog.log 2>&1
 # For testing
 */1 * * * * (cd ~/lobby/silic/ && ~/.local/bin/poetry run python dev/test_pyaudio.py) >/tmp/ppylog.log 2>&1
 
