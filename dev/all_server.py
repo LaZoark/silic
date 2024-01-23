@@ -9,6 +9,7 @@ from flask import Flask, request, jsonify
 import sqlalchemy as db
 from datetime import datetime
 import shutil
+from pydub import AudioSegment
 logging = color.setup(name=__name__, level=color.INFO)
 CONFIG_PATH: str = os.path.join(os.getcwd(), "config")
 cfg = Configuration(config_path=CONFIG_PATH)
@@ -28,6 +29,7 @@ MINIO_ENDPOINT: str = config["minio"]["endpoint"]
 ACCESS_KEY: str = config["minio"]["access_key"]
 SECRET_KEY: str = config["minio"]["secret_key"]
 BUCKET_NAME: str = config["minio"]["bucket_name"]
+DOWNLOAD_FROM_MINIO: bool = config["minio"]["enable"]
 
 app = Flask(__name__)
 
@@ -41,28 +43,36 @@ def slic_browser():
     print(f"file_path: {file_name}")
     print(f"download_path: {download_path}")
 
-    ########## Use local record file ##########
+    ########## Use local record file ########## (和前面的`download_path`一樣)
     # folder = os.getcwd()
     # localfile_path = os.path.join(folder, current_datetime, file_name)
     # print(f"localfile_path: {localfile_path}")
     # shutil.copy(localfile_path, download_path)
 
-    ########## Download the file from S3 ##########
-    minio_client = Minio(   
-      endpoint=MINIO_ENDPOINT, 
-      access_key=ACCESS_KEY, 
-      secret_key=SECRET_KEY, 
-      secure=False
-    )
-    minio_client.fget_object(
-      bucket_name=BUCKET_NAME,
-      object_name=file_name, 
-      file_path=download_path
+    if DOWNLOAD_FROM_MINIO:
+      ########## Download the file from S3 ##########
+      minio_client = Minio(
+        endpoint=MINIO_ENDPOINT, 
+        access_key=ACCESS_KEY, 
+        secret_key=SECRET_KEY, 
+        secure=False
       )
+      minio_client.fget_object(
+        bucket_name=BUCKET_NAME,
+        object_name=file_name, 
+        file_path=download_path
+        )
 
     # classed by silic
     os.makedirs(home_base_path, exist_ok=True)
 
+    if os.path.splitext(download_path)[-1] == ".flac":
+      print(f"Unsupported format. Trying to convert .flac to .wav... [{file_name=}]")
+      _song = AudioSegment.from_file(download_path, format="FLAC")
+      _song.export(os.path.splitext(download_path)[0] + ".wav", format="WAV")
+    else: 
+      print(f"Unsupported format. Skipping the inference... [{file_name=}]")
+    
     silic.browser(
       source=download_path,
       model=SILIC_MODEL,
@@ -71,9 +81,10 @@ def slic_browser():
       conf_thres=SILIC_CONF_THRES,
       zip=False,  # zip=false表示不產生zip檔
     )  
-
-    # 调用函数删除特定类型的文件（例如删除路径'./samples3/'下的file）
-    delete_specific_files(home_base_path, file_name)
+    
+    if DOWNLOAD_FROM_MINIO:
+      # Delete local files under the folder (RESULT_BASE_PATH)
+      delete_specific_files(home_base_path, file_name)
     shutil.rmtree(os.path.join(RESULT_BASE_PATH, "audio"))
     shutil.rmtree(os.path.join(RESULT_BASE_PATH, "linear"))
     shutil.rmtree(os.path.join(RESULT_BASE_PATH, "rainbow"))
