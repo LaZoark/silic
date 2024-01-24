@@ -1,5 +1,5 @@
 version:
-  v: 1.0.0
+  v: 1.0.2
 pg:
   database_url: "postgresql://silic:silic@140.113.13.93:5432/silic"
   schema_name: "silic"
@@ -12,32 +12,33 @@ silic:
   conf_thres: 0.5
 
 minio:  # s3 blub
-  # endpoint: "localhost:9010"
+  # enable: false     # Set to false to use local audio data to inference and will not remove the audio file.
+  enable: true     # Set to false to use local audio data to inference and will not remove the audio file.
   endpoint: "140.113.13.93:9010"
-  access_key: "admin"
+  access_key: admin
   secret_key: "987654321"
-  bucket_name: "silic-bucket"
+  bucket_name: silic-bucket
 
 mic:  # microphone channel
   channels: 1 
 
 api:
-  url_post_endpoint: "http://ed716.duckdns.org:5000/silic"
+  # url_post_endpoint: "http://ed716.duckdns.org:5000/silic"
+  url_post_endpoint: "http://127.0.0.1:5000/silic"
 
 device:
 # NTU_XT1, XT2 (溪頭)
 # NTU_HS1 (和社)
 # NTU_DG1 (對高岳)
   prefix: NTU
-  id: 2
-  location: DG
+  id: 999
+  location: TEST
 
 audio:
   frames_per_buffer: 1024
   sample_rate: 44100 #48000
   record_seconds: 5
-  # using_flac: true # default using .wav
-  using_flac: false # default using .wav
-  # FORMAT: pyaudio.paInt16
+  using_flac: true # default using .wav
+  # using_flac: false # default using .wav
   save_folder_path: "/media/silic"
-  
+  # save_folder_path: "."

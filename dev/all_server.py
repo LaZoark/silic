@@ -63,11 +63,14 @@ def slic_browser():
       logging.warning(f"Unsupported format. Trying to convert .flac to .wav... [{file_name=}]")
       _song = AudioSegment.from_file(download_path, format="FLAC")
       _song.export(os.path.splitext(download_path)[0] + ".wav", format="WAV")
+      converted_file_path = os.path.splitext(download_path)[0] + ".wav"
+    elif os.path.splitext(download_path)[-1] == ".wav":
+      converted_file_path = download_path
     else: 
       logging.warning(f"Unsupported format. Skipping the inference... [{file_name=}]")
     
     silic.browser(
-      source=download_path,
+      source=converted_file_path,
       model=SILIC_MODEL,
       step=SILIC_STEP,
       targetclasses=PG_TARGETCLASSES_M,
@@ -76,8 +79,10 @@ def slic_browser():
     )  
     
     if DOWNLOAD_FROM_MINIO:
-      # Delete local files under the folder (RESULT_BASE_PATH)
-      delete_specific_files(home_base_path, file_name)
+      delete_specific_files(download_path)
+    if download_path != converted_file_path:
+      delete_specific_files(converted_file_path)
+    # Delete local files under the folder (RESULT_BASE_PATH)
     shutil.rmtree(os.path.join(RESULT_BASE_PATH, "audio"))
     shutil.rmtree(os.path.join(RESULT_BASE_PATH, "linear"))
     shutil.rmtree(os.path.join(RESULT_BASE_PATH, "rainbow"))
@@ -99,18 +104,14 @@ def slic_browser():
     return jsonify({"error": str(e)}), 500
 
 
-# delete the download file
-def delete_specific_files(directory: str, file_extension: str):
-  file_list = os.listdir(directory)
-  # 删除特定类型的文件
-  for file in file_list:
-    if file.endswith(file_extension):
-      file_path = os.path.join(directory, file)
-      try:
-        os.remove(file_path)
-        print("Downloaded file removed successfully.")
-      except Exception as e:
-        print(f"Error! Please ensure {file_path} is closed. [log: {e}]")
+def delete_specific_files(file_path: str):
+  """delete the file (Usually delete a `.wav` after the silic inference)"""
+  try:
+    logging.debug(f"Deleting [{file_path}]...")
+    os.remove(file_path)
+    logging.debug(f"Downloaded file [{file_path}] was removed successfully.")
+  except Exception as e:
+    logging.error(f"Please checkout [{file_path}]. \n[log: {e}]")
 
 
 # Store the result to pg
