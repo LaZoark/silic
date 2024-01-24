@@ -71,18 +71,18 @@ def record_audio(duration: int, folder: str="."):
 
   logging.debug(f"Handle the microphone successfully! [{stream}]")
   logging.info("Recording audio...")
-  frames = []
-  for i in range(0, int(AUDIO_SAMPLE_RATE / AUDIO_FRAMES_PER_BUFFER * duration)):
-    try:
+  try:
+    frames = []
+    for i in range(0, int(AUDIO_SAMPLE_RATE / AUDIO_FRAMES_PER_BUFFER * duration)):
       data = stream.read(AUDIO_FRAMES_PER_BUFFER)
-    except Exception as e:
-      logging.critical(f"Ignoring...{e}")
-    frames.append(data)
-  logging.info("Finished recording.")
+      frames.append(data)
+    logging.info("Finished recording.")
 
-  stream.stop_stream()
-  stream.close()
-  py_audio.terminate()
+    stream.stop_stream()
+    stream.close()
+    py_audio.terminate()
+  except Exception as e:
+    logging.critical(f"Ignoring...{e}")
 
   # Create folder based on current date
   current_date = datetime.now().strftime("%Y-%m-%d")
