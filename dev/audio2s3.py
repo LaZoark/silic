@@ -61,12 +61,12 @@ def record_audio(duration: int, folder: str="."):
     # input_device_index=3,
     frames_per_buffer=AUDIO_FRAMES_PER_BUFFER
   )
-  print("Recording audio...")
+  logging.info("Recording audio...")
   frames = []
   for i in range(0, int(AUDIO_SAMPLE_RATE / AUDIO_FRAMES_PER_BUFFER * duration)):
     data = stream.read(AUDIO_FRAMES_PER_BUFFER)
     frames.append(data)
-  print("Finished recording.")
+  logging.info("Finished recording.")
 
   stream.stop_stream()
   stream.close()
@@ -98,7 +98,7 @@ def record_audio(duration: int, folder: str="."):
   try:
     post_byrestful(filename)
   except Exception as e:
-    print(f"[!!] {e}")
+    logging.error(f"{e}")
 
 
 def upload_to_minio(filepath: str):
@@ -123,9 +123,9 @@ def upload_to_minio(filepath: str):
         length=file_stat.st_size,
         content_type="audio/flac" if AUDIO_USING_FLAC else "audio/wav"
       )
-    print(f"檔案 {filepath} 已成功上傳到 {BUCKET_NAME}/{object_name}")
+    logging.info(f"檔案 {filepath} 已成功上傳到 {BUCKET_NAME}/{object_name}")
   except InvalidResponseError as err:
-    print("Minio Error: ", err)
+    logging.error(f"Minio Error: {err}")
 
 
 def post_byrestful(filename):
@@ -133,9 +133,9 @@ def post_byrestful(filename):
   data = {"file_name": filename}
   response = requests.post(url, json=data)
   if response.status_code == 200:
-    print("POST success", response.json())
+    logging.info(f"POST successfully: {response.json()}")
   else:
-    print("An error occurred:", response.json())
+    logging.warning(f"POST ERROR(res={response.status_code}): {response.json()}")
 
 
 if __name__ == "__main__":
