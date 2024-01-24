@@ -66,6 +66,9 @@ def record_audio(duration: int, folder: str="."):
     except Exception as err:
       logging.critical(f"{err} \nRetry the microphone after 2 seconds...")
       time.sleep(2)
+      import sys
+      os.execv(sys.executable, ['python'] + sys.argv)
+
   logging.debug(f"Handle the microphone successfully! [{stream}]")
   logging.info("Recording audio...")
   frames = []
