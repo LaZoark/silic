@@ -70,7 +70,10 @@ def record_audio(duration: int, folder: str="."):
   logging.info("Recording audio...")
   frames = []
   for i in range(0, int(AUDIO_SAMPLE_RATE / AUDIO_FRAMES_PER_BUFFER * duration)):
-    data = stream.read(AUDIO_FRAMES_PER_BUFFER)
+    try:
+      data = stream.read(AUDIO_FRAMES_PER_BUFFER)
+    except Exception as e:
+      logging.critical(f"Ignoring...{e}")
     frames.append(data)
   logging.info("Finished recording.")
 
