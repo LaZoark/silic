@@ -130,7 +130,8 @@ def upload_to_minio(filepath: str):
         content_type="audio/flac" if AUDIO_USING_FLAC else "audio/wav"
       )
     logging.info(f"檔案 {filepath} 已成功上傳到 {BUCKET_NAME}/{object_name}")
-  except InvalidResponseError as err:
+  # except InvalidResponseError as err:
+  except Exception as err:  # To catch all error (including `RequestTimeTooSkewed`)
     logging.error(f"Minio Error: {err}")
 
 
