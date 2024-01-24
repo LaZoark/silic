@@ -53,14 +53,20 @@ AUDIO_FILE_FORMAT: typing.Literal[".wav", ".flac"] = ".flac" if AUDIO_USING_FLAC
 
 def record_audio(duration: int, folder: str="."):
   py_audio = pyaudio.PyAudio()
-  stream = py_audio.open(
-    format=AUDIO_FORMAT, 
-    channels=MIC_CHANNELS, 
-    rate=AUDIO_SAMPLE_RATE, 
-    input=True, 
-    # input_device_index=3,
-    frames_per_buffer=AUDIO_FRAMES_PER_BUFFER
-  )
+  stream = None   # Init as None to check if pyaudio is function normally
+  while stream is None:
+    try:
+      stream = py_audio.open(
+        format=AUDIO_FORMAT, 
+        channels=MIC_CHANNELS, 
+        rate=AUDIO_SAMPLE_RATE, 
+        input=True, 
+        frames_per_buffer=AUDIO_FRAMES_PER_BUFFER
+      )
+    except Exception as err:
+      logging.critical(f"{err} \nRetry the microphone after 2 seconds...")
+      time.sleep(2)
+  logging.debug(f"Handle the microphone successfully! [{stream}]")
   logging.info("Recording audio...")
   frames = []
   for i in range(0, int(AUDIO_SAMPLE_RATE / AUDIO_FRAMES_PER_BUFFER * duration)):
