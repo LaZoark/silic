@@ -55,9 +55,14 @@ NOTSET = 0
 class ColoredLogger(logging.Logger):
     # FORMAT = "[$BOLD%(name)-20s$RESET][%(levelname)-18s]  %(message)s ($BOLD%(filename)s$RESET:%(lineno)d)"
     # FORMAT = "[$BOLD%(name)s$RESET][%(levelname)s] %(message)s ($BOLD%(filename)s$RESET:%(lineno)d)"
-    FORMAT = "[%(levelname)s] %(message)s ($BOLD%(pathname)s$RESET:%(lineno)d)"
+    # FORMAT = "[%(levelname)s] %(message)s ($BOLD%(pathname)s$RESET:%(lineno)d)"
+    FORMAT = "[%(levelname)s] %(message)s ($BOLD%(filename)s$RESET:%(lineno)d)"
     COLOR_FORMAT = formatter_message(FORMAT, True)
-    def __init__(self, name: str, level: int=logging.INFO):
+    def __init__(self, name: str, level: int=logging.NOTSET):
+        """
+        name (str): name of the logger
+        level (int): default log level. Set to `logging.NOTSET` to prevent from affecting other library.
+        """
         logging.Logger.__init__(self, name, level=level)
         color_formatter = ColoredFormatter(self.COLOR_FORMAT)
 

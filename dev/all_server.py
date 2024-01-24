@@ -10,7 +10,7 @@ import sqlalchemy as db
 from datetime import datetime
 import shutil
 from pydub import AudioSegment
-logging = color.setup(name=__name__, level=color.INFO)
+logging = color.setup(name=__name__, level=color.DEBUG)
 CONFIG_PATH: str = os.path.join(os.getcwd(), "config")
 cfg = Configuration(config_path=CONFIG_PATH)
 config: dict = cfg.read_yaml(fname="default.yaml", verbose=True)
@@ -40,17 +40,10 @@ def slic_browser():
   try:
     file_name = request.json["file_name"]
     download_path = os.path.join(home_base_path, file_name)
-    print(f"file_path: {file_name}")
-    print(f"download_path: {download_path}")
-
-    ########## Use local record file ########## (和前面的`download_path`一樣)
-    # folder = os.getcwd()
-    # localfile_path = os.path.join(folder, current_datetime, file_name)
-    # print(f"localfile_path: {localfile_path}")
-    # shutil.copy(localfile_path, download_path)
+    logging.info(f"Receive {file_name = }")
+    logging.info(f"Real file path: [{download_path = }]")
 
     if DOWNLOAD_FROM_MINIO:
-      ########## Download the file from S3 ##########
       minio_client = Minio(
         endpoint=MINIO_ENDPOINT, 
         access_key=ACCESS_KEY, 
@@ -67,11 +60,11 @@ def slic_browser():
     os.makedirs(home_base_path, exist_ok=True)
 
     if os.path.splitext(download_path)[-1] == ".flac":
-      print(f"Unsupported format. Trying to convert .flac to .wav... [{file_name=}]")
+      logging.warning(f"Unsupported format. Trying to convert .flac to .wav... [{file_name=}]")
       _song = AudioSegment.from_file(download_path, format="FLAC")
       _song.export(os.path.splitext(download_path)[0] + ".wav", format="WAV")
     else: 
-      print(f"Unsupported format. Skipping the inference... [{file_name=}]")
+      logging.warning(f"Unsupported format. Skipping the inference... [{file_name=}]")
     
     silic.browser(
       source=download_path,
@@ -147,16 +140,11 @@ def upload_data_to_postgresql(
       if_exists=if_exists, 
       index=False
     )
-    print("Store to PostgreSQL successfully!")
+    logging.info("Store to PostgreSQL successfully!")
   except Exception as e:
-    print(f"Error uploading data to PostgreSQL: {str(e)}")
+    logging.error(f"Error uploading data to PostgreSQL: {str(e)}")
 
 
 if __name__ == "__main__":
-  # file_name = 'recording_20230804_170020.mp3'    # get file name
-  # file_path = file_name                          # get file path
-  # download_path = "./samples3/"+file_name
-  # folder = "/mnt/usb/audio_record_data/"  # 於/mnt/usb/目錄下
-
   # start the restful
   app.run(host="0.0.0.0", port=5000)
