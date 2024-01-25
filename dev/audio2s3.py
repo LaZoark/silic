@@ -82,7 +82,10 @@ def record_audio(duration: int, folder: str="."):
     stream.close()
     py_audio.terminate()
   except Exception as e:
-    logging.critical(f"Ignoring...{e}")
+    logging.critical(f"Ignore and reboot! {e}")
+    time.sleep(2)
+    import sys
+    os.execv(sys.executable, ['python'] + sys.argv)
 
   # Create folder based on current date
   current_date = datetime.now().strftime("%Y-%m-%d")
