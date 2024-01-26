@@ -74,7 +74,7 @@ def record_audio(duration: int, folder: str="."):
   try:
     frames = []
     for i in range(0, int(AUDIO_SAMPLE_RATE / AUDIO_FRAMES_PER_BUFFER * duration)):
-      data = stream.read(AUDIO_FRAMES_PER_BUFFER)
+      data = stream.read(AUDIO_FRAMES_PER_BUFFER, exception_on_overflow=False)  # Prevent from overflow
       frames.append(data)
     logging.info("Finished recording.")
 
