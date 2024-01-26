@@ -30,13 +30,15 @@ ACCESS_KEY: str = config["minio"]["access_key"]
 SECRET_KEY: str = config["minio"]["secret_key"]
 BUCKET_NAME: str = config["minio"]["bucket_name"]
 DOWNLOAD_FROM_MINIO: bool = config["minio"]["enable"]
+AUDIO_SAVE_FOLDER_PATH: bool = config["audio"]["save_folder_path"]
 
 app = Flask(__name__)
 
 @app.route("/silic", methods=["POST"])
 def slic_browser():
   current_datetime: str = datetime.now().strftime("%Y-%m-%d")
-  home_base_path = os.path.join(os.getcwd(), current_datetime)
+  # home_base_path = os.path.join(os.getcwd(), current_datetime)
+  home_base_path = os.path.join(AUDIO_SAVE_FOLDER_PATH, current_datetime)
   try:
     file_name = request.json["file_name"]
     download_path = os.path.join(home_base_path, file_name)
