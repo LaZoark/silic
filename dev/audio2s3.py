@@ -82,8 +82,8 @@ def record_audio(duration: int, folder: str="."):
     stream.close()
     py_audio.terminate()
   except Exception as e:
-    logging.critical(f"Ignore and reboot! {e}")
-    time.sleep(2)
+    logging.critical(f"Ignore and restart (5 seconds later)! {e}")
+    time.sleep(5)
     import sys
     os.execv(sys.executable, ['python'] + sys.argv)
 
