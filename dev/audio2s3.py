@@ -142,7 +142,6 @@ def upload_to_minio(filepath: str):
     selected_minio_bucket_name = BUCKET_NAME_REDUNDANT
   try:
     minio_client.list_buckets()
-    logging.info(f"Successfully connected to the redundant minio endpoint. ({MINIO_ENDPOINT_REDUNDANT = })")
   except Exception as e:
     logging.error(f"Neither the default nor redundant endpoints were connected! Restart the script after 3 seconds...\n{e}")
     time.sleep(3)
