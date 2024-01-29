@@ -39,6 +39,10 @@ MINIO_ENDPOINT: str = config["minio"]["endpoint"]
 ACCESS_KEY: str = config["minio"]["access_key"]
 SECRET_KEY: str = config["minio"]["secret_key"]
 BUCKET_NAME: str = config["minio"]["bucket_name"]
+MINIO_ENDPOINT_REDUNDANT: str = config["minio"]["endpoint_redundant"]
+ACCESS_KEY_REDUNDANT: str = config["minio"]["access_key_redundant"]
+SECRET_KEY_REDUNDANT: str = config["minio"]["secret_key_redundant"]
+BUCKET_NAME_REDUNDANT: str = config["minio"]["bucket_name_redundant"]
 MACHINE_PREFIX: str = config["device"]["prefix"]
 MACHINE_ID: typing.List[int|str] = config["device"]["id"]
 MACHINE_LOCATION: typing.Literal["XT", "HS", "DG"] = config["device"]["location"]
@@ -123,22 +127,44 @@ def upload_to_minio(filepath: str):
     secret_key=SECRET_KEY, 
     secure=False
   )
+  selected_minio_bucket_name = BUCKET_NAME
+  try:
+    minio_client.list_buckets()
+  except Exception as e:
+    logging.warning(f"Unable to connect to the default MINIO endpoint.({MINIO_ENDPOINT = }) error: {e}")
+    logging.info(f"Using the backup endpoint... ({MINIO_ENDPOINT_REDUNDANT = })")
+    minio_client = Minio(
+      endpoint=MINIO_ENDPOINT_REDUNDANT, 
+      access_key=ACCESS_KEY_REDUNDANT, 
+      secret_key=SECRET_KEY_REDUNDANT, 
+      secure=False
+    )
+    selected_minio_bucket_name = BUCKET_NAME_REDUNDANT
+  try:
+    minio_client.list_buckets()
+    logging.info(f"Successfully connected to the redundant minio endpoint. ({MINIO_ENDPOINT_REDUNDANT = })")
+  except Exception as e:
+    logging.error(f"Neither the default nor redundant endpoints were connected! Restart the script after 3 seconds...\n{e}")
+    time.sleep(3)
+    import sys
+    os.execv(sys.executable, ['python'] + sys.argv)
+
   try:
     # 檢查bucket是否存在，如果不存在，則建立一個
-    if not minio_client.bucket_exists(BUCKET_NAME):
-      minio_client.make_bucket(BUCKET_NAME)
+    if not minio_client.bucket_exists(selected_minio_bucket_name):
+      minio_client.make_bucket(selected_minio_bucket_name)
     with open(filepath, "rb") as file_data:
       file_stat = os.stat(filepath)
       object_name = os.path.basename(filepath)
       # https://stackoverflow.com/questions/55223401/minio-python-client-upload-bytes-directly
       minio_client.put_object(
-        bucket_name=BUCKET_NAME, 
+        bucket_name=selected_minio_bucket_name, 
         object_name=object_name, 
         data=file_data, 
         length=file_stat.st_size,
         content_type="audio/flac" if AUDIO_USING_FLAC else "audio/wav"
       )
-    logging.info(f"檔案 {filepath} 已成功上傳到 {BUCKET_NAME}/{object_name}")
+    logging.info(f"檔案 {filepath} 已成功上傳到 {selected_minio_bucket_name}/{object_name}")
   # except InvalidResponseError as err:
   except Exception as err:  # To catch all error (including `RequestTimeTooSkewed`)
     logging.error(f"Minio Error: {err}")

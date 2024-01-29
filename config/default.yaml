@@ -1,5 +1,5 @@
 version:
-  v: 1.0.2
+  v: 1.0.3
 pg:
   database_url: "postgresql://silic:silic@140.113.13.93:5432/silic"
   schema_name: "silic"
@@ -18,6 +18,10 @@ minio:  # s3 blub
   access_key: admin
   secret_key: "987654321"
   bucket_name: silic-bucket
+  endpoint_redundant: "140.113.13.93:9010"
+  access_key_redundant: admin
+  secret_key_redundant: "987654321"
+  bucket_name_redundant: silic-bucket
 
 mic:  # microphone channel
   channels: 1 

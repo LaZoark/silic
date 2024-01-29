@@ -29,6 +29,10 @@ MINIO_ENDPOINT: str = config["minio"]["endpoint"]
 ACCESS_KEY: str = config["minio"]["access_key"]
 SECRET_KEY: str = config["minio"]["secret_key"]
 BUCKET_NAME: str = config["minio"]["bucket_name"]
+MINIO_ENDPOINT_REDUNDANT: str = config["minio"]["endpoint_redundant"]
+ACCESS_KEY_REDUNDANT: str = config["minio"]["access_key_redundant"]
+SECRET_KEY_REDUNDANT: str = config["minio"]["secret_key_redundant"]
+BUCKET_NAME_REDUNDANT: str = config["minio"]["bucket_name_redundant"]
 DOWNLOAD_FROM_MINIO: bool = config["minio"]["enable"]
 AUDIO_SAVE_FOLDER_PATH: bool = config["audio"]["save_folder_path"]
 
@@ -52,8 +56,31 @@ def slic_browser():
         secret_key=SECRET_KEY, 
         secure=False
       )
+      selected_minio_bucket_name = BUCKET_NAME
+      try:
+        minio_client.list_buckets()
+      except Exception as e:
+        logging.warning(f"Unable to connect to the default MINIO endpoint.({MINIO_ENDPOINT = }) error: {e}")
+        logging.info(f"Using the backup endpoint... ({MINIO_ENDPOINT_REDUNDANT = })")
+        minio_client = Minio(
+          endpoint=MINIO_ENDPOINT_REDUNDANT, 
+          access_key=ACCESS_KEY_REDUNDANT, 
+          secret_key=SECRET_KEY_REDUNDANT, 
+          secure=False
+        )
+        selected_minio_bucket_name = BUCKET_NAME_REDUNDANT
+      try:
+        minio_client.list_buckets()
+        logging.info(f"Successfully connected to the redundant minio endpoint. ({MINIO_ENDPOINT_REDUNDANT = })")
+      except Exception as e:
+        logging.error(f"Neither the default nor redundant endpoints were connected! Skipping...\n{e}")
+        # logging.error(f"Neither the default nor redundant endpoints were connected! Restart the script after 3 seconds...\n{e}")
+        # import sys, time
+        # time.sleep(3)
+        # os.execv(sys.executable, ['python'] + sys.argv)
+
       minio_client.fget_object(
-        bucket_name=BUCKET_NAME,
+        bucket_name=selected_minio_bucket_name,
         object_name=file_name, 
         file_path=download_path
         )
