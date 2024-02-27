@@ -74,7 +74,7 @@ def record_audio(duration: int, folder: str="."):
       os.execv(sys.executable, ['python'] + sys.argv)
 
   logging.debug(f"Handle the microphone successfully! [{stream}]")
-  logging.info("Recording audio...")
+  logging.info(f"Recording audio... [{datetime.now().strftime('%Y/%m/%d %H:%M:%S')}, {duration=} s]")
   try:
     frames = []
     for i in range(0, int(AUDIO_SAMPLE_RATE / AUDIO_FRAMES_PER_BUFFER * duration)):
