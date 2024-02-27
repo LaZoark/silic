@@ -30,6 +30,8 @@ cd ~/lobby/silic && ~/.local/bin/poetry run python dev/audio2s3.py
 
 # Run the audio script
 @reboot (sleep 60 && cd ~/lobby/silic/ && ~/.local/bin/poetry run python dev/audio2s3.py) >/tmp/ppylog.log 2>&1
+# Run the AI server script
+@reboot (sleep 50 && cd ~/lobby/silic/ && ~/.local/bin/poetry run python dev/all_server.py) >/dev/null 2>&1
 # For testing
 */1 * * * * (cd ~/lobby/silic/ && ~/.local/bin/poetry run python dev/test_pyaudio.py) >/tmp/ppylog.log 2>&1
 
