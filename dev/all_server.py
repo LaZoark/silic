@@ -124,8 +124,9 @@ def slic_browser():
       # if_exists="replace"
       if_exists="append"
     )
+    _msg = f"Successfully processed `{file_name}` and restore to pg archive."
     return (
-      jsonify({"message": "Successfully processed the file and restore to pg archive."}),
+      jsonify({"message": _msg}),
       200
       )
 
