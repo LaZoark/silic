@@ -15,6 +15,7 @@ from datetime import datetime
 from minio import Minio
 from minio.error import InvalidResponseError
 from pydub import AudioSegment
+import threading
 
 from utils.params import Configuration
 from utils.color_log import color
@@ -113,9 +114,12 @@ def record_audio(duration: int, folder: str="."):
     _song = AudioSegment.from_wav(audio_file)
     _song.export(audio_file, format="FLAC")
 
-  upload_to_minio(audio_file)
+  # upload_to_minio(audio_file)
+  await_thread = upload_to_minio_thread(audio_file)
   try:
-    post_byrestful(filename)
+    # post_byrestful(filename)
+    await_thread.join()
+    post_byrestful_thread(filename)
   except Exception as e:
     logging.error(f"{e}")
 
@@ -178,6 +182,14 @@ def post_byrestful(filename):
   else:
     logging.warning(f"POST ERROR(res={response.status_code}): {response.json()}")
 
+def upload_to_minio_thread(filepath: str):
+  # threading.Thread(target=upload_to_minio, args=(filepath, )).start()
+  tt = threading.Thread(target=upload_to_minio, args=(filepath, ))
+  tt.start()
+  return tt
+
+def post_byrestful_thread(filename):
+  threading.Thread(target=post_byrestful, args=(filename, )).start()
 
 if __name__ == "__main__":
   # AUDIO_RECORD_SECONDS = 5
