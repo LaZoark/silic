@@ -1,15 +1,17 @@
 [tool.poetry]
 name = "silic"
-version = "0.1.0"
+version = "0.1.1"
 description = "This project aim to develop the solution to the bird sound classification."
 authors = ["LaZoark <emersonchen086@icloud.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.10,<3.12"
+python = ">=3.10,<3.11"
 
 
-torch = "^2.0.0"
+torch = { version = "^2.0.0+cu118", source = "torch", markers="sys_platform == 'linux'"}
+torchaudio = { version = "^2.0.1+cu118", source="torch", markers="sys_platform == 'linux'"}
+torchvision = { version = "^0.15.1+cu118", source="torch", markers="sys_platform == 'linux'"}
 absl-py = "1.4.0"
 asttokens = "2.2.1"
 backcall = "0.2.0"
@@ -43,11 +45,11 @@ matplotlib = "3.7.1"
 matplotlib-inline = "0.1.6"
 nnaudio = "0.3.2"
 numpy = "1.24.2"
-oauthlib = "3.2.2"
+#oauthlib = "3.2.2"
 opencv-python = "4.7.0.72"
 packaging = "23.0"
 pandas = "2.0.0"
-parso = "0.8.3"
+#parso = "0.8.3"
 pickleshare = "0.7.5"
 pillow = "9.5.0"
 prompt-toolkit = "3.0.38"
@@ -107,3 +109,10 @@ ipykernel = "^6.26.0"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+[[tool.poetry.source]]
+name = "torch"
+url = "https://download.pytorch.org/whl/cu118"
+priority = "explicit"
+# markers = "sys_platform == 'linux'"
+# default = false
+# secondary = true
